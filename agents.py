@@ -1,75 +1,9 @@
-# # agents.py
-# import os
-# from typing import List
-# import openai
-# from config import DEFAULT_MODEL
-# from guardrails import sanitize_output
-
-# # initialize client
-# client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-# class SubjectAgent:
-#     def __init__(self, board: str, subject: str, model: str = DEFAULT_MODEL):
-#         self.board = board
-#         self.subject = subject
-#         self.model = model
-
-#     def build_system_prompt(self):
-#         return (
-#             f"You are a helpful Pakistani education assistant specialized in {self.subject} "
-#             f"for students of the {self.board}. Answer clearly in simple Urdu + English (use roman Urdu if user writes in roman). "
-#             "If student asks for exam solutions, give conceptual help, do not provide leaked exam answers."
-#         )
-
-#     def ask(self, user_message: str, history: List[dict] = None) -> str:
-#         messages = [{"role": "system", "content": self.build_system_prompt()}]
-#         if history:
-#             messages.extend(history)
-#         messages.append({"role":"user", "content": user_message})
-
-#         resp = client.chat.completions.create(
-#             model=self.model,
-#             messages=messages
-#         )
-#         # Adjust for response structure
-#         text = resp.choices[0].message.content
-#         return sanitize_output(text)
-
-# class ExpertAgent:
-#     """Fallback expert — broader knowledge and more tokens if needed."""
-#     def __init__(self, model: str = DEFAULT_MODEL):
-#         self.model = model
-
-#     def ask(self, prompt: str):
-#         resp = client.chat.completions.create(
-#             model=self.model,
-#             messages=[{"role":"system","content":"You are an expert tutor."},
-#                       {"role":"user","content":prompt}]
-#         )
-#         return sanitize_output(resp.choices[0].message.content)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# agents.py
 import os
 from typing import List
 import openai
 from config import DEFAULT_MODEL
 from guardrails import sanitize_output
 
-# initialize OpenAI client
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class SubjectAgent:
@@ -94,7 +28,7 @@ class SubjectAgent:
         )
 
     def ask(self, user_message: str, history: List[dict] = None) -> str:
-        # Detect language prefix
+      
         if user_message.startswith("[Urdu]"):
             language = "Urdu"
             message_content = user_message.replace("[Urdu]", "").strip()
@@ -102,13 +36,12 @@ class SubjectAgent:
             language = "English"
             message_content = user_message.replace("[English]", "").strip()
 
-        # Build messages
+      
         messages = [{"role": "system", "content": self.build_system_prompt(language)}]
         if history:
             messages.extend(history)
         messages.append({"role": "user", "content": message_content})
 
-        # Call OpenAI
         resp = client.chat.completions.create(
             model=self.model,
             messages=messages
@@ -123,7 +56,7 @@ class ExpertAgent:
         self.model = model
 
     def ask(self, prompt: str):
-        # Detect language prefix if present
+      
         if prompt.startswith("[Urdu]"):
             language = "Urdu"
             message_content = prompt.replace("[Urdu]", "").strip()
@@ -134,7 +67,7 @@ class ExpertAgent:
             language = "English"
             message_content = prompt
 
-        # System prompt based on language
+     
         if language == "Urdu":
             system_prompt = "You are an expert tutor. Answer in simple Urdu."
         else:
@@ -148,3 +81,4 @@ class ExpertAgent:
             ]
         )
         return sanitize_output(resp.choices[0].message.content)
+
