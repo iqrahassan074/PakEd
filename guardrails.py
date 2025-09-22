@@ -14,5 +14,6 @@ def input_allowed(text: str) -> tuple[bool, str]:
     return True, ""
 
 def sanitize_output(text: str) -> str:
-    # minimal sanitization — strip weird control chars
+    
     return re.sub(r"[\x00-\x1f\x7f-\x9f]", "", text).strip()
+
