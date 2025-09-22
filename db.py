@@ -1,4 +1,3 @@
-# db.py
 import sqlite3
 from datetime import datetime
 from typing import List, Dict
@@ -52,3 +51,4 @@ def get_session_messages(session_id: int):
     rows = cur.fetchall()
     conn.close()
     return [{"role": r[0], "content": r[1], "created_at": r[2]} for r in rows]
+
